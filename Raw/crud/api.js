@@ -19,8 +19,10 @@ app.post("/api/users", function (req, res) {
     // db Save
     // console.log(user);
     // if a new entry is created on server
-    // memory -> ram
+    // memory -> ram ,thus only DB.push will not push the userdata in DB
     userDB.push(user);
+
+    // __dirname gives path of curr directory u are working in
     fs.writeFileSync(path.join(__dirname, 
         "user.json"),
         JSON.stringify(userDB));
@@ -32,12 +34,6 @@ app.post("/api/users", function (req, res) {
 })
 
 // read  => GET ONE 
-app.get("/api/users", function (req, res) {
-   console.log("got the request") ;
-   res.status(200).json({
-       status: "success received get request" 
-   })
-})
 app.get("/api/users/:user_id", function (req, res) {
     let { user_id } = req.params;
     let user;
