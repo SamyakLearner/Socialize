@@ -3,9 +3,9 @@ var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     // db password
-    password: 'password',
+    password: 'bpit9868',
     // db instance name 
-    database: 'insta_pp'
+    database: 'socialize'
 })
 connection.connect();
 console.log("connected to db");

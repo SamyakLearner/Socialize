@@ -1,91 +1,164 @@
 let userDB = require("../model/user.json");
-function createUser(req, res) {
-    let user = req.body;
-    // db Save
-    // console.log(user);
-    // if a new entry is created on server
-    // memory -> ram
-    userDB.push(user);
-    fs.writeFileSync(path.join(__dirname,
-        "user.json"),
-        JSON.stringify(userDB));
-    //    res status code server send 
-    res.status(201).json({
-        success: "successfull",
-        user: user
-    })
-}
-
-function getUser(req, res) {
-    let { user_id } = req.params;
-    let user;
-    for (let i = 0; i < userDB.length; i++) {
-        if (userDB[i].user_id == user_id) {
-            user = userDB[i];
-        }
+let userModel = require("../model/userModel");
+let userFollowerModel = require("../model/userFollowerModel");
+async function createUser(req, res) {
+    console.log("inside userController create users") ;
+    try {
+        let ndbuser = await userModel.create(req.body);
+        // db Save
+        // console.log(user);
+        // if a new entry is created on server
+        // memory -> ram
+        //    res status code server send 
+        res.status(201).json({
+            success: "successfull",
+            user: ndbuser
+        })
+    } catch (err) {
+        console.log("error at userController") ;
+        res.status(500).json({
+            success: "failure",
+            "message": err.message
+        })
     }
-    if (user == undefined) {
-        return res.status(404).json({
+}
+async function getUser(req, res) {
+    try {
+        let { user_id } = req.params;
+        let user;
+        //   db get using id 
+        user = await userModel.getById(user_id);
+        if (user == undefined) {
+            console.log("user is undefined") ;
+            return res.status(404).json({
+                status: "failure",
+                message: "user not found"
+            })
+        }
+        res.status(200).json({
+            status: "success",
+            user: user
+        })
+    } catch (err) {
+        console.log("error at userController2") ;
+        console.log(err);
+        res.status(500).json({
+            message: err.message,
             status: "failure",
-            message: "user not found"
         })
     }
 
-    res.status(200).json({
-        status: "success",
-        user: user
-    })
 }
-function updateUser(req, res) {
+async function updateUser(req, res) {
     let { user_id } = req.params;
-    // {user_id:12345}
-    let user;
-    let toUpdate = req.body;
-    for (let i = 0; i < userDB.length; i++) {
-        if (userDB[i].user_id == user_id) {
-            user = userDB[i];
-        }
-    }
-
-    if (user == undefined) {
-        return res.status(404).json({
-            status: "failure",
-            message: "user not found"
-        })
-    }
-    // update
-    for (let key in toUpdate) {
-        user[key] = toUpdate[key];
-    }
-    fs.writeFileSync(path.join(__dirname, "user.json"), JSON.stringify(userDB));
+    let updateObj = req.body;
+    // sql => update 
+    // getById=> user
+    // send to res
     // update 
-    res.status(200).json({
-        status: "success",
-        "message": "message"
-    })
-
-}
-function deleteUser(req, res) {
-    let { user_id } = req.params;
-    // {user_id:12345}
-    let initialUserL = userDB.length;
-    userDB = userDB.filter(function (user) {
-        return user.user_id != user_id;
-    })
-    if (initialUserL == userDB.length) {
-        return res.status(404).json({
+    try {
+        await userModel.updateById(user_id, updateObj);
+        const uUser = await userModel.getById(user_id);
+        res.status(200).json({
+            status: "success",
+            "message": uUser
+        })
+    } catch (err) {
+        console.log("error at userController3") ;
+        res.status(500).json({
             status: "failure",
-            message: "user not found"
+            err: err.message
         })
     }
-    fs.writeFileSync(path.join(__dirname, "user.json"), JSON.stringify(userDB));
+    // {user_id:12345}
+}
+async function deleteUser(req, res) {
+    let { user_id } = req.params;
+    try {
+        const dUser = await userModel.getById(user_id);
+        await userModel.deleteById(user_id, updateObj);
+        res.status(200).json({
+            status: "success",
+            "message": dUser
 
-    res.status(200).json({
-        status: "success",
-        "message": "user deleted"
-    })
+        })
+    } catch (err) {
+        res.status(500).json({
+            status: "failure",
+            err: err.message
+        })
+    }
+}
+async function getAllUser(req, res) {
+    try {
+        let user;
+        //   db get using id 
+        user = await userModel.getAll();
+        if (user.length == 0) {
+            console.log("user length is 0" ) ;
+            return res.status(404).json({
+                status: "failure",
+                message: "user not found"
+            })
+        }
+        res.status(200).json({
+            status: "success",
+            user: user
+        })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            message: err.message,
+            status: "failure",
+        })
+    }
+
+}
+async function handleRequest(req, res) {
+    try {
+        // user_id=> public/private
+        let reqobj = req.body;
+        let { is_public } = await userModel.getById(reqobj.user_id);
+        if (is_public == true) {
+            reqobj.is_pending = false;
+            let mappingObj = await userFollowerModel.createRequest(reqobj);
+            return res.status(201).json({
+                status: "accepted",
+                request: mappingObj,
+                "message": "your request has been accepted"
+
+            })
+        }
+        let mappingObj = await userFollowerModel.createRequest(reqobj);
+        return res.status(201).json({
+            status: "pending",
+            request: mappingObj,
+            "message": "your request is pending user will accept it "
+
+        })
+        // check
+        //  public=> is_pending => false
+        // private => is_pending=>true
+        // create Request
+        // db Save
+        // console.log(user);
+        // if a new entry is created on server
+        // memory -> ram
+        //    res status code server send 
+        res.status(201).json({
+            success: "successfull",
+            message: mappingObj
+        })
+    } catch (err) {
+        res.status(500).json({
+            success: "failure",
+            "message": err.message
+        })
+    }
 }
 module.exports.createUser = createUser;
 module.exports.updateUser = updateUser;
 module.exports.deleteUser = deleteUser;
 module.exports.getUser = getUser;
+module.exports.getAllUser = getAllUser;
+module.exports.handleRequest = handleRequest;

@@ -4,13 +4,15 @@ const { v4: uuidv4 } = require('uuid');
 const create = function (userobj) {
     // create user in db
     // google / facebook 
+    console.log("inside userModel create user") ;
     userobj.uid = uuidv4();
     // validation=> extra value 
     return new Promise(function (resolve, reject) {
         db.query('INSERT INTO user SET ?', userobj, function (err, result) {
             // Neat!
             if (err) {
-                reject(err)
+                console.log("error at userModel") ;
+                reject(err) ;
             } else {
                 resolve(userobj);
             }
@@ -24,7 +26,7 @@ const getById = function (id) {
     return new Promise(function (resolve, reject) {
         db.query(`SELECT * from user WHERE uid="${id}"`, function (err, result) {
             if (err) {
-
+                console.log("error at userModel2") ;
                 reject(err);
             } else {
                 resolve(result[0])
@@ -32,12 +34,12 @@ const getById = function (id) {
         })
     })
 }
-const getAll = function (id) {
+const getAll = function () {
     // get user in db
     return new Promise(function (resolve, reject) {
         db.query(`SELECT * from user`, function (err, result) {
             if (err) {
-
+                console.log("error at userModel3") ;
                 reject(err);
             } else {
                 resolve(result)
@@ -52,6 +54,7 @@ const updateById = function (uid, updateObj) {
     //     name: "Jasbir",
     //         number : 8800943685
     // }
+    // name="kjghh",number="jghfjg"
     let updateStr = "";
     for (let key in updateObj) {
         updateStr += `${key} = "${updateObj[key]}",`
@@ -64,9 +67,10 @@ const updateById = function (uid, updateObj) {
     return new Promise(function (resolve, reject) {
         db.query(query, function (err, result) {
             if (err) {
+                console.log("error at userModel4") ;
                 reject(err);
             } else {
-                resolve(result);
+                resolve();
             }
 
         })
@@ -79,10 +83,10 @@ const deleteById = function (id) {
     return new Promise(function (resolve, reject) {
         db.query(` DELETE  from user WHERE uid="${id}"`, function (err, result) {
             if (err) {
-
+                console.log("error at userModel5") ;
                 reject(err);
             } else {
-                resolve(result)
+                resolve()
             }
         })
     })

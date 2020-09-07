@@ -1,19 +1,16 @@
 {
-  "name": "Insta_clone",
+  "name": "Activity",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "api.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon crud/api.js"
+    "start" : "nodemon api.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.4"
+    "mysql": "^2.18.1"
   }
 }
