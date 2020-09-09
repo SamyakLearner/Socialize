@@ -1,8 +1,8 @@
 let userDB = require("../model/user.json");
 let userModel = require("../model/userModel");
 let userFollowerModel = require("../model/userFollowerModel");
+// ********************CRUD USER*****************
 async function createUser(req, res) {
-    console.log("inside userController create users") ;
     try {
         let ndbuser = await userModel.create(req.body);
         // db Save
@@ -15,7 +15,6 @@ async function createUser(req, res) {
             user: ndbuser
         })
     } catch (err) {
-        console.log("error at userController") ;
         res.status(500).json({
             success: "failure",
             "message": err.message
@@ -28,8 +27,8 @@ async function getUser(req, res) {
         let user;
         //   db get using id 
         user = await userModel.getById(user_id);
+
         if (user == undefined) {
-            console.log("user is undefined") ;
             return res.status(404).json({
                 status: "failure",
                 message: "user not found"
@@ -40,7 +39,6 @@ async function getUser(req, res) {
             user: user
         })
     } catch (err) {
-        console.log("error at userController2") ;
         console.log(err);
         res.status(500).json({
             message: err.message,
@@ -64,7 +62,6 @@ async function updateUser(req, res) {
             "message": uUser
         })
     } catch (err) {
-        console.log("error at userController3") ;
         res.status(500).json({
             status: "failure",
             err: err.message
@@ -95,7 +92,6 @@ async function getAllUser(req, res) {
         //   db get using id 
         user = await userModel.getAll();
         if (user.length == 0) {
-            console.log("user length is 0" ) ;
             return res.status(404).json({
                 status: "failure",
                 message: "user not found"
@@ -114,6 +110,7 @@ async function getAllUser(req, res) {
     }
 
 }
+// *******************Request***********************
 async function handleRequest(req, res) {
     try {
         // user_id=> public/private
@@ -156,9 +153,98 @@ async function handleRequest(req, res) {
         })
     }
 }
+async function acceptRequest(req, res) {
+    try {
+        // user_id=> public/private
+        let { user_id, follower_id } = req.params;
+        await userFollowerModel.acceptRequestQ(user_id, follower_id);
+        let { handle } = await userModel.getById(follower_id);
+        res.status(201).json({
+            success: "successfull",
+            message: `${handle} started following you`
+        })
+    } catch (err) {
+        res.status(500).json({
+            success: "failure",
+            "message": err.message
+        })
+    }
+}
+
+async function rejectRequest(req, res) {
+    try {
+        // user_id=> public/private
+        let { user_id, follower_id } = req.params;
+        await userFollowerModel.rejectRequestQ(user_id, follower_id);
+        let { handle } = await userModel.getById(follower_id);
+        res.status(201).json({
+            success: "successfull",
+            message: `${handle} rejected`
+        })
+    } catch (err) {
+        res.status(500).json({
+            success: "failure",
+            "message": err.message
+        })
+    }
+}
+
+async function getAllFollowers(req, res) {
+
+    try {
+        // user_id=> public/private
+        let { user_id } = req.params;
+        // user_id, follower_id,is_pending ,
+        let UfollResult = await userFollowerModel.getAllFolId(user_id);
+        if (UfollResult.length > 0) {
+            async function helper(userfollowObj) {
+                let { follower_id, is_pending } = userfollowObj;
+                // user table
+                let { handle, p_img_url } = await userModel
+                    .getById(follower_id);
+                console.log(handle);
+                return { handle, p_img_url, is_pending };
+            }
+//             let newArr = [];
+//             for (let i = 0; i < UfollResult.length; i++) {
+//                 newArr.push(helper(UfollResult[i]));
+//             }
+// console.log("Line no 212");
+//             console.log(newArr);
+            let pArray = UfollResult.map(helper);
+            //  await => sync 
+            let folImgHandArr = await Promise.all(pArray);
+
+            res.status(201).json({
+                success: "successfull",
+                message: folImgHandArr
+            })
+        } else {
+            res.status(201).json({
+                success: "successfull",
+                message: `no user found`
+            })
+        }
+        // 1. image_url
+        // 2. handle
+
+        // res.status(201).json({
+        //     success: "successfull",
+        //     message: `${handle} rejected`
+        // })
+    } catch (err) {
+        res.status(500).json({
+            success: "failure",
+            "message": err.message
+        })
+    }
+}
 module.exports.createUser = createUser;
 module.exports.updateUser = updateUser;
 module.exports.deleteUser = deleteUser;
 module.exports.getUser = getUser;
 module.exports.getAllUser = getAllUser;
 module.exports.handleRequest = handleRequest;
+module.exports.acceptRequest = acceptRequest;
+module.exports.rejectRequest = rejectRequest;
+module.exports.getAllFollowers = getAllFollowers;

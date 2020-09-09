@@ -3,7 +3,7 @@ var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     // db password
-    password: 'password',
+    password: 'bpit9868',
     // db instance name 
     database: 'socialize'
 })
