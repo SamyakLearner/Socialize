@@ -10,7 +10,7 @@ const fs = require("fs");
 const path = require("path");
 const userRouter = require("./router/userRouter");
 // to send static resources to client 
-app.use(express.static("view"))
+app.use(express.static("view")) ;
 // const postRouter = require("./router/postRouter");
 // REST API
 // HTTP request => 
