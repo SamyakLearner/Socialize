@@ -16,7 +16,9 @@ Full Stack Project : Fully Functional Social Networking Service
 3. External Libraries 
 
    3.1 Authentication -> OAuth
+   
    3.2 Animations     -> Framer Motion
+   
    3.3 Routing        -> React Router DOM
    
 4. Features :
