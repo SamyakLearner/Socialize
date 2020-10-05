@@ -24,11 +24,17 @@ Full Stack Project : Fully Functional Social Networking Service
 4. Features :
 
    4.1 Friend Requests 
+	
    4.2 Comment and Like on Posts 
+	
    4.3 Home Page
+	
    4.4 Settings Page
+	
    4.5 Profile Page
+	
    4.6 Follower Suggestions
+	
    4.7 Timeline and Feeds
 
 More features to be updated soon ...
