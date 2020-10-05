@@ -7,7 +7,9 @@ Full Stack Project : Fully Functional Social Networking Service
    
 2. Frameworks and Tools 
    2.1. FrontEnd -> React.js
+   
    2.2  BackEnd  -> Express , Node.js
+   
    2.3  Database -> MySQL
        
 3. External Libraries 
