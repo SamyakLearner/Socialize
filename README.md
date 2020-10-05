@@ -2,7 +2,7 @@
 
 Full Stack Project : Fully Functional Social Networking Service
 
-1 .Design Pattern :	Factory Design Pattern
+ 1 .Design Pattern :	Factory Design Pattern
    
 2. Frameworks and Tools 
 
